@@ -7,7 +7,7 @@ enum Room_type
 	bedroom = 1,
 	livingroom,
 	kitchen,
-	bathroom,
+	Bathroom,
 	childhood
 };
 
@@ -15,13 +15,13 @@ enum Building_type
 {
 	home = 1,
 	garage,
-	bathroom,
+	Bathhouse,
 	barn
 };
 
 struct Room 
 { 
-	int square = 0;
+	int room_square = 0;
 	Room_type room_type;
 };
 
@@ -35,18 +35,34 @@ struct House { std::vector<Floor> floors; };
 
 struct Building
 {
-	int square = 0;
+	int building_square = 0;
 	Building_type type;
 	bool chimney = false;
 	House house;
 };
 
-struct Region { std::vector<Building> buildings; };
+struct Region 
+{
+	std::vector<Building> buildings;
+	int square_region = 0;
+};
 
 void fill_type_and_square_room(House& house, const
-	Room_type& type, const int* itI, const int* itJ) 
+	Room_type& type, const int* itI, const int* itJ, int* amount) 
 { 
 	house.floors[*itI].rooms[*itJ].room_type = type;
+	*amount = 0;
+	while (*amount <= 0)
+	{
+		std::cout << "Enter the area of the room: ";
+		std::cin >> *amount;
+		if (*amount <= 0)
+		{
+			std::cerr << "Error! The area of the room could not be " <<
+				"equal to 0 or less than 0. Try again. " << std::endl;
+		}
+		else house.floors[*itI].rooms[*itJ].room_square = *amount;
+	}
 }
 
 void fill_information_about_floor(House& house, int* amount)
@@ -91,15 +107,15 @@ void fill_information_about_floor(House& house, int* amount)
 			std::cout << "Specify the type of room(Bedroom - 1,livingroom - 2,kitchen - 3,bathroom - 4,childhood - 5)\n:";
 			std::cin >> *amount;
 			if (*amount == Room_type::bedroom)
-				fill_type_and_square_room(house, Room_type::bedroom, &i, &j);
+				fill_type_and_square_room(house, Room_type::bedroom, &i, &j, amount);
 			else if (*amount == Room_type::livingroom)
-				fill_type_and_square_room(house, Room_type::livingroom, &i, &j);
+				fill_type_and_square_room(house, Room_type::livingroom, &i, &j, amount);
 			else if (*amount == Room_type::kitchen)
-				fill_type_and_square_room(house, Room_type::kitchen, &i, &j);
-			else if (*amount == Room_type::bathroom)
-				fill_type_and_square_room(house, Room_type::bathroom, &i, &j);
+				fill_type_and_square_room(house, Room_type::kitchen, &i, &j, amount);
+			else if (*amount == Room_type::Bathroom)
+				fill_type_and_square_room(house, Room_type::Bathroom, &i, &j, amount);
 			else if (*amount == Room_type::childhood)
-				fill_type_and_square_room(house, Room_type::childhood, &i, &j);
+				fill_type_and_square_room(house, Room_type::childhood, &i, &j, amount);
 			else
 			{
 				std::cerr << "Error! You can only select rooms from this list: " <<
@@ -121,7 +137,7 @@ void fill_type_building_and_square(std::vector<Region>& regions,
 		if (*amount <= 0) 
 			std::cerr << "Error! The building area cannot be equal to 0 or less than 0. Try again." << std::endl;
 		else
-			regions[*itI].buildings[*itI].square = *amount;
+			regions[*itI].buildings[*itI].building_square = *amount;
 	}
 }
 
@@ -129,7 +145,7 @@ void is_there_chimney(std::vector<Region>& regions,
 	const int* itI,const int* itJ, std::string check)
 {
 	std::cout << "Is there a chimney ? (yes or no) \n:";
-	std::getline(std::cin, check);
+	std::cin >> check;
 	if (check == "yes")
 		regions[*itI].buildings[*itJ].chimney = true;
 }
@@ -139,7 +155,7 @@ void fill_region_buildings(std::vector<Region>& regions, int* amount)
 	std::string check;
 	for (int i = 0; i < regions.size(); ++i)
 	{
-		std::cout << "How many buildings are there " << i << " region ? ";
+		std::cout << "How many buildings are there " << i + 1 << " region ? ";
 		std::cin >> *amount;
 		if (*amount < 0)
 		{
@@ -154,8 +170,8 @@ void fill_region_buildings(std::vector<Region>& regions, int* amount)
 	{
 		for (int j = 0; j < regions[i].buildings.size(); ++j)
 		{
-			std::cout << "What buildings are there " << i + 1 << " region ? " << std::endl;
-			std::cout << "Home - 1, garage - 2, bathroom - 3, barn - 4.\n:";
+			std::cout << "What type of building is under the number " << j + 1 << ", in " << i + 1 << " region ? " << std::endl;
+			std::cout << "Home - 1, garage - 2, bathhouse - 3, barn - 4.\n:";
 			std::cin >> *amount;
 			if (*amount == Building_type::home)
 			{
@@ -165,9 +181,9 @@ void fill_region_buildings(std::vector<Region>& regions, int* amount)
 			}
 			else if (*amount == Building_type::garage)
 				fill_type_building_and_square(regions, &i, &j, Building_type::garage, amount);
-			else if (*amount == Building_type::bathroom)
+			else if (*amount == Building_type::Bathhouse)
 			{
-				fill_type_building_and_square(regions, &i, &j, Building_type::bathroom, amount);
+				fill_type_building_and_square(regions, &i, &j, Building_type::Bathhouse, amount);
 				is_there_chimney(regions, &i, &j, check);
 			}
 			else if (*amount == Building_type::barn)
@@ -175,7 +191,7 @@ void fill_region_buildings(std::vector<Region>& regions, int* amount)
 			else
 			{
 				std::cerr << "Error! You can only select buildings from this list: " <<
-					"\nHome - 1, garage - 2, bathroom - 3, barn - 4. Try again. \n";
+					"\nHome - 1, garage - 2, bathhouse - 3, barn - 4. Try again. \n";
 			}
 		}
 	}
@@ -191,25 +207,25 @@ void print(const std::vector<Region>& regions)
 			{
 				std::cout << "Region: " << i << "\tBuilding number: " << j <<
 					"\tBuilding type: " << "House." << "\tBuilding square: " <<
-					regions[i].buildings[j].square << std::endl;
+					regions[i].buildings[j].building_square << std::endl;
 			}
 			if (regions[i].buildings[j].type == Building_type::garage)
 			{
 				std::cout << "Region: " << i << "\tBuilding number: " << j <<
 					"\tBuilding type: " << "Garage." << "\tBuilding square: " <<
-					regions[i].buildings[j].square << std::endl;
+					regions[i].buildings[j].building_square << std::endl;
 			}
-			if (regions[i].buildings[j].type == Building_type::bathroom)
+			if (regions[i].buildings[j].type == Building_type::Bathhouse)
 			{
 				std::cout << "Region: " << i << "\tBuilding number: " << j <<
 					"\tBuilding type: " << "Bathroom." << "\tBuilding square: " <<
-					regions[i].buildings[j].square << std::endl;
+					regions[i].buildings[j].building_square << std::endl;
 			}
 			if (regions[i].buildings[j].type == Building_type::barn)
 			{
 				std::cout << "Region: " << i << "\tBuilding number: " << j <<
 					"\tBuilding type: " << "Barn." << "\tBuilding square: " <<
-					regions[i].buildings[j].square << std::endl;
+					regions[i].buildings[j].building_square << std::endl;
 			}
 		}
 	}
@@ -229,6 +245,19 @@ int main()
 	else
 	{
 		std::vector<Region> regions(amount);
+		for (int i = 0; i < regions.size(); ++i)
+		{
+			std::cout << "Specify the area of the region: ";
+			std::cin >> amount;
+			if (amount <= 0)
+			{
+				std::cerr << "Error! The area of the region could not be " <<
+					"equal to 0 or less than 0. Try again. " << std::endl;
+				--i;
+			}
+			else
+				regions[i].square_region = amount;
+		}
 		fill_region_buildings(regions, &amount);
 	}
 
