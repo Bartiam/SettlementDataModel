@@ -43,6 +43,12 @@ struct Building
 
 struct Region { std::vector<Building> buildings; };
 
+void fill_type_and_square_room(House& house, const
+	Room_type& type, const int* itI, const int* itJ) 
+{ 
+	house.floors[*itI].rooms[*itJ].room_type = type;
+}
+
 void fill_information_about_floor(House& house, int* amount)
 {
 	while (house.floors.size() == 0)
@@ -82,7 +88,23 @@ void fill_information_about_floor(House& house, int* amount)
 
 		for (int j = 0; j < house.floors[i].rooms.size(); ++j)
 		{
-
+			std::cout << "Specify the type of room(Bedroom - 1,livingroom - 2,kitchen - 3,bathroom - 4,childhood - 5)\n:";
+			std::cin >> *amount;
+			if (*amount == Room_type::bedroom)
+				fill_type_and_square_room(house, Room_type::bedroom, &i, &j);
+			else if (*amount == Room_type::livingroom)
+				fill_type_and_square_room(house, Room_type::livingroom, &i, &j);
+			else if (*amount == Room_type::kitchen)
+				fill_type_and_square_room(house, Room_type::kitchen, &i, &j);
+			else if (*amount == Room_type::bathroom)
+				fill_type_and_square_room(house, Room_type::bathroom, &i, &j);
+			else if (*amount == Room_type::childhood)
+				fill_type_and_square_room(house, Room_type::childhood, &i, &j);
+			else
+			{
+				std::cerr << "Error! You can only select rooms from this list: " <<
+					"\Bedroom - 1, livingroom - 2, kitchen - 3, bathroom - 4, childhood - 5. Try again. \n";
+			}
 		}
 	}
 }
@@ -92,7 +114,7 @@ void fill_type_building_and_square(std::vector<Region>& regions,
 {
 	regions[*itI].buildings[*itJ].type = type;
 	*amount = 0;
-	while (*amount == 0)
+	while (*amount <= 0)
 	{
 		std::cout << "Specify the area of this building: ";
 		std::cin >> *amount;
