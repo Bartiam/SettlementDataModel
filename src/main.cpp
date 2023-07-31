@@ -248,6 +248,7 @@ void print(const std::vector<Region>& regions, const int& village_square)
 
 				for (int k = 0; k < regions[i].buildings[j].house.floors.size(); ++k)
 				{
+					std::cout << "Floor: " << k + 1;
 					std::cout << "Ceiling height: " << regions[i].buildings[j].house.floors[k].ceilingHeight << std::endl;
 
 					for (int rt = 0; rt < regions[i].buildings[j].house.floors[k].rooms.size(); ++rt)
